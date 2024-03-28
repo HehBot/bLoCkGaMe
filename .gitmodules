@@ -1,0 +1,3 @@
+[submodule "dep/graphics"]
+	path = ext/graphics
+	url = git@github.com:HehBot/graphics.git
