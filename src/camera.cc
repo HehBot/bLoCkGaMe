@@ -18,19 +18,14 @@ glm::mat4 Camera::projection(float aspect) const
     return glm::perspective(glm::radians(fov), aspect, 0.1f, 100.0f);
 }
 
-float Camera::step(float deltaTime) const
+void Camera::moveFront(float delta)
 {
-    return speed * deltaTime;
+    pos += speed * delta * front;
 }
 
-void Camera::moveFront(float step)
+void Camera::moveRight(float delta)
 {
-    pos += step * front;
-}
-
-void Camera::moveRight(float step)
-{
-    pos += step * right;
+    pos += speed * delta * right;
 }
 
 void Camera::updateFront(glm::vec3 newFront)

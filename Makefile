@@ -13,7 +13,7 @@ SRCS := $(shell find $(SRC_DIR) -name '*.cc' -or -name '*.c')
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
-CXX_FLAGS := -Wall -Wpedantic -Werror -g -O3 -I$(SRC_DIR) -I../graphics/src -MMD -MP
+CXX_FLAGS := -Wall -Wpedantic -Werror -g -O3 -I$(SRC_DIR) -I$(EXT_DIR)/graphics/src -MMD -MP
 CC_FLAGS := -O3 -I$(SRC_DIR) -MMD -MP
 LD_FLAGS := -L$(EXT_DIR)/graphics/lib
 LIB_FLAGS :=  -l:libgraphics.a -lglfw -lGL -lX11

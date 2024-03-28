@@ -15,9 +15,8 @@ public:
     Camera(glm::vec3 _pos, glm::vec3 _front);
     glm::mat4 view() const;
     glm::mat4 projection(float aspect) const;
-    float step(float deltaTime) const;
-    void moveFront(float step);
-    void moveRight(float step);
+    void moveFront(float delta);
+    void moveRight(float delta);
     void updateFront(glm::vec3 newFront);
     void updateFov(float newFov);
 };

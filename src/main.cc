@@ -292,7 +292,10 @@ int main()
 
     Camera camera(glm::vec3(0, 0, 20), glm::vec3(0.0, 0.0, -1.0));
     bool window_should_close = false;
-    std::function<void(Event&)> callback = [&renderer, &window, &window_should_close, &camera](Event& event) {
+    struct {
+        bool up = false, down = false, left = false, right = false;
+    } button_held;
+    std::function<void(Event&)> callback = [&renderer, &window, &window_should_close, &camera, &button_held](Event& event) {
         event.handled = true;
         switch (event.get_type()) {
         case EventType::WindowClose:
@@ -304,23 +307,36 @@ int main()
             if (k == Key::ESCAPE)
                 window_should_close = true;
             else if (k == Key::UP || k == Key::W)
-                camera.moveFront(1);
+                button_held.up = true;
             else if (k == Key::DOWN || k == Key::S)
-                camera.moveFront(-1);
-            else if (k == Key::RIGHT || k == Key::D)
-                camera.moveRight(1);
+                button_held.down = true;
             else if (k == Key::LEFT || k == Key::A)
-                camera.moveRight(-1);
+                button_held.left = true;
+            else if (k == Key::RIGHT || k == Key::D)
+                button_held.right = true;
             else
                 std::cout << "Unhandled key " << (int)k << '\n';
+            break;
+        }
+        case EventType::KeyReleased: {
+            KeyReleasedEvent& e = dynamic_cast<KeyReleasedEvent&>(event);
+            auto const k = e.get_key();
+            if (k == Key::UP || k == Key::W)
+                button_held.up = false;
+            else if (k == Key::DOWN || k == Key::S)
+                button_held.down = false;
+            else if (k == Key::LEFT || k == Key::A)
+                button_held.left = false;
+            else if (k == Key::RIGHT || k == Key::D)
+                button_held.right = false;
             break;
         }
         case EventType::MouseMoved: {
             MouseMovedEvent& e = dynamic_cast<MouseMovedEvent&>(event);
             float const xpos = e.get_x(), ypos = e.get_y();
             double yaw, pitch;
-            yaw = glm::radians(360.0 * xpos / window->get_width() - 270.0);
-            pitch = glm::radians(90.0 - 180.0 * ypos / window->get_height());
+            yaw = glm::radians(360.0 * xpos / window->width - 270.0);
+            pitch = glm::radians(90.0 - 180.0 * ypos / window->height);
             camera.updateFront(glm::vec3(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)));
             break;
         }
@@ -334,6 +350,7 @@ int main()
         }
     };
     window->set_event_callback(callback);
+    window->set_vsync(false);
 
     std::shared_ptr<Shader> shader = Shader::create({ "res/shaders/vert.glsl", "res/shaders/frag.glsl" });
     shader->bind();
@@ -372,13 +389,29 @@ int main()
 
     renderer->set_clear_color({ 0.2f, 0.3f, 0.3f, 1.0f });
 
+    double start = window->get_time();
+    size_t nr_frames = 0;
+    window->init_delta_timer();
     while (!window_should_close) {
         renderer->clear();
-        shader->set_mat4("projection", camera.projection(window->get_width() * 1.0f / window->get_height()));
+        shader->set_mat4("projection", camera.projection(window->width * 1.0f / window->height));
         shader->set_mat4("view", camera.view());
         renderer->draw_triangles(vao, vertex_count);
         window->on_update();
-    }
 
+        double delta = window->get_delta_time();
+        if (button_held.up && !button_held.down)
+            camera.moveFront(delta);
+        else if (button_held.down && !button_held.up)
+            camera.moveFront(-delta);
+        if (button_held.right && !button_held.left)
+            camera.moveRight(delta);
+        else if (button_held.left && !button_held.right)
+            camera.moveRight(-delta);
+
+        nr_frames++;
+    }
+    std::cout << "Frame rate: " << nr_frames / (window->get_time() - start) << "fps\n";
+    std::cout << "#Triangles: " << vertex_count / 3 << '\n';
     return 0;
 }
