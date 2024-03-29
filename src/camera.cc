@@ -4,7 +4,7 @@
 glm::vec3 const Camera::globalUp(0.0f, 1.0f, 0.0f);
 
 Camera::Camera(glm::vec3 _pos, glm::vec3 _front)
-    : pos(_pos), front(glm::normalize(_front)), right(glm::normalize(glm::cross(_front, globalUp))), speed(5.0f), fov(45.0f)
+    : pos(_pos), front(glm::normalize(_front)), right(glm::normalize(glm::cross(_front, globalUp))), speed(20.0f), fov(60.0f)
 {
 }
 
