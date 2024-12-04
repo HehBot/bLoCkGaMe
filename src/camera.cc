@@ -1,4 +1,5 @@
-#include <camera.h>
+#include "camera.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 glm::vec3 const Camera::globalUp(0.0f, 1.0f, 0.0f);
@@ -15,7 +16,7 @@ glm::mat4 Camera::view() const
 
 glm::mat4 Camera::projection(float aspect) const
 {
-    return glm::perspective(glm::radians(fov), aspect, 0.1f, 100.0f);
+    return glm::perspective(glm::radians(fov), aspect, 0.1f, 1000.0f);
 }
 
 void Camera::moveFront(float delta)

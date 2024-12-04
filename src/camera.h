@@ -1,5 +1,5 @@
-#ifndef CAMERA_HPP
-#define CAMERA_HPP
+#ifndef CAMERA_H
+#define CAMERA_H
 
 #include <glm/glm.hpp>
 
@@ -13,6 +13,10 @@ class Camera {
 
 public:
     Camera(glm::vec3 _pos, glm::vec3 _front);
+    glm::vec3 position() const
+    {
+        return pos;
+    }
     glm::mat4 view() const;
     glm::mat4 projection(float aspect) const;
     void moveFront(float delta);
@@ -21,4 +25,4 @@ public:
     void updateFov(float newFov);
 };
 
-#endif // CAMERA_HPP
+#endif // CAMERA_H
