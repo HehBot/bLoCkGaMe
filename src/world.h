@@ -7,8 +7,8 @@
 #include <map>
 #include <vector>
 
-#define RENDER_DISTANCE_CHUNKS 10
-#define MAX_CHUNKS (4 * RENDER_DISTANCE_CHUNKS * RENDER_DISTANCE_CHUNKS)
+#define RENDER_DISTANCE_CHUNKS 2
+#define CHUNK_CACHE_SIZE ((2 * RENDER_DISTANCE_CHUNKS + 1) * (2 * RENDER_DISTANCE_CHUNKS + 1) * (2 * RENDER_DISTANCE_CHUNKS + 1) * 2)
 
 class World {
 private:
@@ -23,6 +23,7 @@ private:
             return (x < c.x || (x == c.x && (y < c.y || (y == c.y && z < c.z))));
         }
     };
+    friend std::ostream& operator<<(std::ostream& o, ChunkPos p);
 
     struct ChunkManager;
 
@@ -37,6 +38,10 @@ private:
         mutable bool last_mesh_valid;
 
     public:
+        Chunk()
+            : last_mesh_valid(false)
+        {
+        }
         void load(ChunkPos p, std::istream& i);
         std::vector<float> mesh() const;
     };
@@ -50,8 +55,8 @@ private:
         std::map<ChunkPos, size_t> file_offsets;
 
         std::map<ChunkPos, size_t> index;
-        Chunk chunks[MAX_CHUNKS];
-        uint16_t valid_queue[MAX_CHUNKS];
+        Chunk chunks[CHUNK_CACHE_SIZE];
+        uint16_t lru[CHUNK_CACHE_SIZE];
 
         ChunkManager(std::fstream& file);
 

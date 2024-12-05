@@ -120,7 +120,7 @@ int main()
     tex_atlas->bind_to_slot(0);
     shader->set_int("tex_atlas", 0);
 
-    std::shared_ptr<VertexBuffer> vbo = VertexBuffer::create(MAX_CHUNKS * (size_t)32 * 32 * 32);
+    std::shared_ptr<VertexBuffer> vbo = VertexBuffer::create(CHUNK_CACHE_SIZE * (size_t)32 * 32 * 32);
     vbo->set_layout({ { ShaderDataType::Float3, "aPos" }, { ShaderDataType::Float2, "aColor" } });
 
     std::shared_ptr<VertexArray> vao = VertexArray::create();
@@ -142,8 +142,10 @@ int main()
 
         if (world->mesh_has_changed(camera.position().x, camera.position().y, camera.position().z)) {
             std::vector<float> v = world->mesh(camera.position().x, camera.position().y, camera.position().z);
-            if (vbo->size() < v.size() * sizeof(v[0]))
+            if (vbo->size() < v.size() * sizeof(v[0])) {
                 vbo->resize_and_clear(v.size() * sizeof(v[0]) * 2);
+                std::cout << "[GPU buffer size = " << v.size() * sizeof(v[0]) * 2 << "]\n";
+            }
             vbo->set_data(&v[0], 0, v.size() * sizeof(v[0]));
             vertex_count = v.size() / 5;
         }
